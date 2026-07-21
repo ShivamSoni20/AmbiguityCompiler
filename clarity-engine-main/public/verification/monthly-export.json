@@ -1,0 +1,13 @@
+{
+  "framework": "vitest",
+  "target": "monthly-export",
+  "contract": "A",
+  "criteria": [
+    "AC1"
+  ],
+  "exitCode": 0,
+  "passed": 1,
+  "failed": 0,
+  "durationMs": 371,
+  "patchHash": "sha256:28a8f753efffa250d93a0c740c05c62957d3da5acd39d38675ba295dc38c8960"
+}

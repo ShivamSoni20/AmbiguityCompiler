@@ -1,0 +1,16 @@
+{
+  "name": "Ambiguity Compiler",
+  "short_name": "Ambiguity Compiler",
+  "description": "Compile vague requirements into human-approved behavioral contracts.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "theme_color": "#0a0e14",
+  "background_color": "#0a0e14",
+  "display": "standalone"
+}
