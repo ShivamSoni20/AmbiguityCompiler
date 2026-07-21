@@ -193,7 +193,7 @@ $env:OPENROUTER_MODEL = "openai/gpt-5.6-sol"
 bun run start
 ```
 
-The default data file is `mcp-server/.data/compilations.json`. Override it with `AMBIGUITY_COMPILER_DATA_FILE` when you need an isolated local session.
+The default data file is `mcp-server/.data/compilations.json`. Override it with `AMBIGUITY_COMPILER_DATA_FILE` when you need an isolated local session. On Vercel, the application uses `/tmp/ambiguity-compiler/compilations.json` because the deployed `/var/task` bundle is read-only. That Vercel file is ephemeral and should only be used for a demo; configure an external database or durable store for production.
 
 ### Tool surface
 

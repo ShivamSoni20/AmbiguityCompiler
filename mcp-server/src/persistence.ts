@@ -2,13 +2,23 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
 import { listAllCompilations, replaceCompilationStore } from "./core";
 
+const vercelTemporaryDirectory = "/tmp/ambiguity-compiler";
+
 const dataPath = process.env.AMBIGUITY_COMPILER_DATA_FILE
   ? resolve(process.env.AMBIGUITY_COMPILER_DATA_FILE)
-  : resolve(
-      process.cwd(),
-      basename(process.cwd()) === "mcp-server" ? ".data" : "mcp-server/.data",
-      "compilations.json",
-    );
+  : defaultCompilationDataPath();
+
+function defaultCompilationDataPath() {
+  if (process.env.VERCEL === "1") {
+    return resolve(vercelTemporaryDirectory, "compilations.json");
+  }
+
+  return resolve(
+    process.cwd(),
+    basename(process.cwd()) === "mcp-server" ? ".data" : "mcp-server/.data",
+    "compilations.json",
+  );
+}
 
 export function compilationDataPath() {
   return dataPath;
