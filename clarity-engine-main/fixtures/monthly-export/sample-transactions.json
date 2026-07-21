@@ -1,0 +1,9 @@
+[
+  {
+    "id": "txn_local_march_boundary",
+    "occurredAt": "2025-02-28T18:45:00.000Z",
+    "status": "posted",
+    "amountMinor": 2500,
+    "currency": "USD"
+  }
+]
