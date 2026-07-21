@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-07-22",
+  "baselineAuditPreserved": [
+    "docs/CODE_AUDIT_REPORT.md",
+    "docs/PRD_TRACEABILITY_MATRIX.md",
+    "docs/AUDIT_EVIDENCE.json"
+  ],
+  "environment": {
+    "gitStatus": "unavailable: workspace is not a Git repository",
+    "storage": "local JSON file shared by documented web and MCP process working directories"
+  },
+  "implemented": [
+    "authoritative persisted web and MCP workflow",
+    "explicit confirmation and optimistic version checks",
+    "selected contract SHA-256 binding for tests and verification",
+    "workspace scope and idempotency keys",
+    "official OpenAI Responses SDK adapter with strict JSON Schema",
+    "OpenRouter compatibility adapter with strict JSON Schema",
+    "official MCP SDK stdio and Streamable HTTP transports",
+    "correct Asia/Kolkata monthly-export boundary fixture"
+  ],
+  "verification": [
+    { "command": "bun install --frozen-lockfile", "status": "passed" },
+    { "command": "bun run check", "status": "passed" },
+    { "command": "npm run test:mcp", "status": "passed", "tests": 6 },
+    { "command": "npm run test:contract", "status": "passed", "tests": 1 },
+    { "command": "npm run test:contract:record", "status": "passed" },
+    { "command": "npm run test:golden-fixture", "status": "passed" },
+    { "command": "npm run validate:plugin", "status": "passed" },
+    { "command": "npm run lint", "status": "passed_with_6_existing_warnings" },
+    { "command": "npm run build", "status": "passed" },
+    { "command": "MCP Streamable HTTP initialize", "status": "passed", "httpStatus": 200 }
+  ],
+  "deferred": [
+    "embedded MCP Apps UI requires registered app identity and deployment",
+    "production persistence, auth, retention, deletion, and multi-process coordination",
+    "live provider smoke test was not run with a credential",
+    "public deployment and Devpost submission artifacts"
+  ]
+}
