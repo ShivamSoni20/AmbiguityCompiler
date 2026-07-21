@@ -1,0 +1,25 @@
+{
+  "name": "ambiguity-compiler",
+  "version": "0.2.0",
+  "description": "Turn vague software requirements into human-approved executable contracts.",
+  "author": {
+    "name": "Ambiguity Compiler contributors"
+  },
+  "license": "MIT",
+  "keywords": ["requirements", "testing", "mcp", "developer-tools", "codex"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Ambiguity Compiler",
+    "shortDescription": "Lock intended behavior before implementation.",
+    "longDescription": "A Codex workflow for exposing ambiguous interpretations, selecting a contract, and linking it to tests and a receipt.",
+    "developerName": "Ambiguity Compiler contributors",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": [
+      "Compile this requirement before implementing it.",
+      "Find hidden behavior choices in this issue.",
+      "Turn this requirement into a testable contract."
+    ],
+    "brandColor": "#2C6BED"
+  }
+}
