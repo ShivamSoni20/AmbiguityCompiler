@@ -80,7 +80,7 @@ const auditEventSchema = z.object({
 });
 
 export const modelOutputSchema = z.object({
-  status: z.enum(["compiled", "needs_context"]),
+  status: z.enum(["compiled", "resolved", "needs_context"]),
   categories: z.array(categorySchema).max(3),
   interpretations: z.array(interpretationSchema).max(3),
   scenarios: z.array(scenarioSchema).max(8),
@@ -134,6 +134,11 @@ const compilationStore = new Map<string, CompilationRecord>();
 const likelySecretPattern =
   /(?:api[_-]?key|authorization|password|secret|token|private[_-]?key)\s*[:=]\s*["']?[^\s"']+|\bsk-[a-z0-9_-]{16,}\b|\bAKIA[0-9A-Z]{16}\b|\bgh[pousr]_[A-Za-z0-9]{20,}\b|\beyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9._-]+/i;
 const defaultWorkspaceId = "default";
+const configuredModelRequestTimeoutMs = Number(process.env.AMBIGUITY_COMPILER_MODEL_TIMEOUT_MS);
+const modelRequestTimeoutMs =
+  Number.isFinite(configuredModelRequestTimeoutMs) && configuredModelRequestTimeoutMs >= 1_000
+    ? configuredModelRequestTimeoutMs
+    : 90_000;
 
 export async function compileRequirement(
   rawInput: unknown,
@@ -195,7 +200,7 @@ export function selectContract(
   const input = selectContractInputSchema.parse(rawInput);
   const record = getCompilation(id, rawWorkspaceId);
   assertExpectedVersion(record, input.expectedVersion);
-  if (record.status !== "compiled")
+  if (record.status !== "compiled" && record.status !== "resolved")
     throw new Error("A contract cannot be selected until compilation succeeds.");
   if (!record.interpretations.some((item) => item.id === input.interpretationId))
     throw new Error("Unknown interpretation.");
@@ -534,7 +539,7 @@ async function requestOpenAiCompilation(
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("OPENAI_API_KEY is required when the OpenAI provider is selected.");
   const model = process.env.OPENAI_MODEL ?? "gpt-5.6";
-  const client = new OpenAI({ apiKey, timeout: 30_000, maxRetries: 2 });
+  const client = new OpenAI({ apiKey, timeout: modelRequestTimeoutMs, maxRetries: 2 });
   const response = await client.responses.create({
     model,
     instructions: systemPrompt(),
@@ -570,7 +575,7 @@ async function requestOpenRouterCompilation(
       "HTTP-Referer": process.env.OPENROUTER_SITE_URL ?? "http://localhost:3001",
       "X-Title": "Ambiguity Compiler",
     },
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.timeout(modelRequestTimeoutMs),
     body: JSON.stringify({
       model,
       messages: [
@@ -638,6 +643,11 @@ function normalizeModelOutput(value: unknown): unknown {
           };
         })
       : value.scenarios,
+    questions: Array.isArray(value.questions)
+      ? value.questions.map((question) =>
+          typeof question === "string" ? question.slice(0, 280) : question,
+        )
+      : value.questions,
   };
 }
 
@@ -677,7 +687,9 @@ function validateSemantics(output: ModelOutput, context: CompileInput["context"]
       throw new Error("needs_context requires targeted questions only.");
     return;
   }
-  if (output.interpretations.length < 2)
+  if (output.status === "resolved" && output.interpretations.length !== 1)
+    throw new Error("A resolved result requires exactly one interpretation.");
+  if (output.status === "compiled" && output.interpretations.length < 2)
     throw new Error("A compiled result requires two or three interpretations.");
   if (output.questions.length > 0)
     throw new Error("Compiled results cannot include clarification questions.");
@@ -696,6 +708,7 @@ function validateSemantics(output: ModelOutput, context: CompileInput["context"]
         throw new Error("Model cited context that was not supplied.");
     }
   }
+  if (output.status === "resolved") return;
   for (let left = 0; left < identifiers.length; left += 1) {
     for (let right = left + 1; right < identifiers.length; right += 1) {
       const separated = output.scenarios.some(
@@ -759,7 +772,7 @@ function goldenFallback(): ModelOutput {
 }
 
 function systemPrompt() {
-  return "You compile underspecified software requirements into behaviorally different contracts. Return only the requested JSON. Never reveal chain-of-thought or write implementation code. Use only the supplied context; do not invent repository facts. Support only boundary_time, authorization_actor, lifecycle_state. Return compiled with exactly two or three interpretations only when each is evidence-grounded and every pair has a differing scenario outcome. Number each interpretation's acceptance IDs AC1, AC2, and so on. For every scenario, include expected.A, expected.B, and expected.C; use null for an ID that is not one of the returned interpretations. Otherwise return needs_context with one to three targeted questions and no interpretations or scenarios.";
+  return "You compile underspecified software requirements into behaviorally different contracts. Return only the requested JSON. Never reveal chain-of-thought or write implementation code. Use only the supplied context; do not invent repository facts. Support only boundary_time, authorization_actor, lifecycle_state. Return compiled with exactly two or three interpretations only when each is evidence-grounded and every pair has a differing scenario outcome. Return resolved with exactly one interpretation when supplied authoritative context explicitly resolves every supported ambiguity category and rules out alternatives. Number each interpretation's acceptance IDs AC1, AC2, and so on. For every scenario, include expected.A, expected.B, and expected.C; use null for an ID that is not one of the returned interpretations. Otherwise return needs_context with one to three targeted questions and no interpretations or scenarios.";
 }
 
 const modelJsonSchema = {
@@ -767,7 +780,7 @@ const modelJsonSchema = {
   additionalProperties: false,
   required: ["status", "categories", "interpretations", "scenarios", "questions"],
   properties: {
-    status: { type: "string", enum: ["compiled", "needs_context"] },
+    status: { type: "string", enum: ["compiled", "resolved", "needs_context"] },
     categories: {
       type: "array",
       items: { type: "string", enum: ["boundary_time", "authorization_actor", "lifecycle_state"] },
@@ -836,7 +849,7 @@ const modelJsonSchema = {
         },
       },
     },
-    questions: { type: "array", items: { type: "string" } },
+    questions: { type: "array", items: { type: "string", maxLength: 280 } },
   },
   $defs: {
     outcome: {

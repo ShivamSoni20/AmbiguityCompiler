@@ -219,6 +219,31 @@ describe("Ambiguity Compiler core lifecycle", () => {
     expect(compilation.status).toBe("compiled");
     expect(compilation.context).toHaveLength(1);
   });
+
+  it("allows a single resolved interpretation to be confirmed", async () => {
+    useFixtureMode();
+    const compilation = await compileRequirement({
+      requirement: "Users can export their monthly transactions.",
+    });
+    replaceCompilationStore([
+      {
+        ...compilation,
+        status: "resolved",
+        interpretations: [compilation.interpretations[0]],
+        scenarios: [],
+        questions: [],
+      },
+    ]);
+
+    const selected = selectContract(compilation.id, {
+      interpretationId: "A",
+      confirmation: true,
+      expectedVersion: 1,
+    });
+
+    expect(selected.version).toBe(2);
+    expect(selected.selectedInterpretationId).toBe("A");
+  });
 });
 
 function useFixtureMode() {

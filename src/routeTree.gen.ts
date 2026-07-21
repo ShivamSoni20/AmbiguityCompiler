@@ -9,27 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as DemoRouteImport } from './routes/demo'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as DemoRouteImport } from './routes/demo'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as DocsInstallRouteImport } from './routes/docs.install'
 import { Route as AppHistoryRouteImport } from './routes/app.history'
-import { Route as AppCompilationsNewRouteImport } from './routes/app.compilations.new'
+import { Route as DocsInstallRouteImport } from './routes/docs.install'
 import { Route as AppCompilationsIdRouteImport } from './routes/app.compilations.$id'
-import { Route as AppCompilationsIdTestsRouteImport } from './routes/app.compilations.$id.tests'
-import { Route as AppCompilationsIdReceiptRouteImport } from './routes/app.compilations.$id.receipt'
+import { Route as AppCompilationsNewRouteImport } from './routes/app.compilations.new'
 import { Route as AppCompilationsIdCompareRouteImport } from './routes/app.compilations.$id.compare'
+import { Route as AppCompilationsIdReceiptRouteImport } from './routes/app.compilations.$id.receipt'
+import { Route as AppCompilationsIdTestsRouteImport } from './routes/app.compilations.$id.tests'
 
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoRoute = DemoRouteImport.update({
-  id: '/demo',
-  path: '/demo',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -37,9 +32,14 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -47,14 +47,19 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AppRoute,
+} as any)
 const DocsInstallRoute = DocsInstallRouteImport.update({
   id: '/docs/install',
   path: '/docs/install',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppHistoryRoute = AppHistoryRouteImport.update({
-  id: '/history',
-  path: '/history',
+const AppCompilationsIdRoute = AppCompilationsIdRouteImport.update({
+  id: '/compilations/$id',
+  path: '/compilations/$id',
   getParentRoute: () => AppRoute,
 } as any)
 const AppCompilationsNewRoute = AppCompilationsNewRouteImport.update({
@@ -62,28 +67,23 @@ const AppCompilationsNewRoute = AppCompilationsNewRouteImport.update({
   path: '/compilations/new',
   getParentRoute: () => AppRoute,
 } as any)
-const AppCompilationsIdRoute = AppCompilationsIdRouteImport.update({
-  id: '/compilations/$id',
-  path: '/compilations/$id',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCompilationsIdTestsRoute = AppCompilationsIdTestsRouteImport.update({
-  id: '/tests',
-  path: '/tests',
-  getParentRoute: () => AppCompilationsIdRoute,
-} as any)
-const AppCompilationsIdReceiptRoute =
-  AppCompilationsIdReceiptRouteImport.update({
-    id: '/receipt',
-    path: '/receipt',
-    getParentRoute: () => AppCompilationsIdRoute,
-  } as any)
 const AppCompilationsIdCompareRoute =
   AppCompilationsIdCompareRouteImport.update({
     id: '/compare',
     path: '/compare',
     getParentRoute: () => AppCompilationsIdRoute,
   } as any)
+const AppCompilationsIdReceiptRoute =
+  AppCompilationsIdReceiptRouteImport.update({
+    id: '/receipt',
+    path: '/receipt',
+    getParentRoute: () => AppCompilationsIdRoute,
+  } as any)
+const AppCompilationsIdTestsRoute = AppCompilationsIdTestsRouteImport.update({
+  id: '/tests',
+  path: '/tests',
+  getParentRoute: () => AppCompilationsIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -181,18 +181,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo': {
-      id: '/demo'
-      path: '/demo'
-      fullPath: '/demo'
-      preLoaderRoute: typeof DemoRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -202,11 +195,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -216,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/history': {
+      id: '/app/history'
+      path: '/history'
+      fullPath: '/app/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/docs/install': {
       id: '/docs/install'
       path: '/docs/install'
@@ -223,11 +230,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsInstallRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/history': {
-      id: '/app/history'
-      path: '/history'
-      fullPath: '/app/history'
-      preLoaderRoute: typeof AppHistoryRouteImport
+    '/app/compilations/$id': {
+      id: '/app/compilations/$id'
+      path: '/compilations/$id'
+      fullPath: '/app/compilations/$id'
+      preLoaderRoute: typeof AppCompilationsIdRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/compilations/new': {
@@ -237,18 +244,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCompilationsNewRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/compilations/$id': {
-      id: '/app/compilations/$id'
-      path: '/compilations/$id'
-      fullPath: '/app/compilations/$id'
-      preLoaderRoute: typeof AppCompilationsIdRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/compilations/$id/tests': {
-      id: '/app/compilations/$id/tests'
-      path: '/tests'
-      fullPath: '/app/compilations/$id/tests'
-      preLoaderRoute: typeof AppCompilationsIdTestsRouteImport
+    '/app/compilations/$id/compare': {
+      id: '/app/compilations/$id/compare'
+      path: '/compare'
+      fullPath: '/app/compilations/$id/compare'
+      preLoaderRoute: typeof AppCompilationsIdCompareRouteImport
       parentRoute: typeof AppCompilationsIdRoute
     }
     '/app/compilations/$id/receipt': {
@@ -258,11 +258,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCompilationsIdReceiptRouteImport
       parentRoute: typeof AppCompilationsIdRoute
     }
-    '/app/compilations/$id/compare': {
-      id: '/app/compilations/$id/compare'
-      path: '/compare'
-      fullPath: '/app/compilations/$id/compare'
-      preLoaderRoute: typeof AppCompilationsIdCompareRouteImport
+    '/app/compilations/$id/tests': {
+      id: '/app/compilations/$id/tests'
+      path: '/tests'
+      fullPath: '/app/compilations/$id/tests'
+      preLoaderRoute: typeof AppCompilationsIdTestsRouteImport
       parentRoute: typeof AppCompilationsIdRoute
     }
   }
