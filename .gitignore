@@ -24,6 +24,7 @@
 # Local editor and automation metadata
 .agents/
 .playwright-mcp/
+clarity-engine-main/
 **/.lovable/
 **/AGENTS.md
 .vscode/

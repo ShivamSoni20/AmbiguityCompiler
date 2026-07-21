@@ -39,7 +39,7 @@ const TABS = [
     body: (
       <>
         <Step n={1} title="Open the project">
-          <Code>cd clarity-engine-main</Code>
+          <Code>cd AmbiguityCompiler</Code>
         </Step>
         <Step n={2} title="Install dependencies">
           <Code>bun install --frozen-lockfile</Code>

@@ -608,22 +608,36 @@ async function requestOpenRouterCompilation(
 
 function parseModelOutput(rawOutput: string): ModelOutput {
   const parsed = JSON.parse(rawOutput) as unknown;
-  return modelOutputSchema.parse(normalizeNullableOutcomes(parsed));
+  return modelOutputSchema.parse(normalizeModelOutput(parsed));
 }
 
-function normalizeNullableOutcomes(value: unknown): unknown {
-  if (!isPlainObject(value) || !Array.isArray(value.scenarios)) return value;
+function normalizeModelOutput(value: unknown): unknown {
+  if (!isPlainObject(value)) return value;
   return {
     ...value,
-    scenarios: value.scenarios.map((scenario) => {
-      if (!isPlainObject(scenario) || !isPlainObject(scenario.expected)) return scenario;
-      return {
-        ...scenario,
-        expected: Object.fromEntries(
-          Object.entries(scenario.expected).filter(([, outcome]) => outcome !== null),
-        ),
-      };
-    }),
+    interpretations: Array.isArray(value.interpretations)
+      ? value.interpretations.map((interpretation) => {
+          if (!isPlainObject(interpretation) || !Array.isArray(interpretation.acceptance))
+            return interpretation;
+          return {
+            ...interpretation,
+            acceptance: interpretation.acceptance.map((criterion, index) =>
+              isPlainObject(criterion) ? { ...criterion, id: `AC${index + 1}` } : criterion,
+            ),
+          };
+        })
+      : value.interpretations,
+    scenarios: Array.isArray(value.scenarios)
+      ? value.scenarios.map((scenario) => {
+          if (!isPlainObject(scenario) || !isPlainObject(scenario.expected)) return scenario;
+          return {
+            ...scenario,
+            expected: Object.fromEntries(
+              Object.entries(scenario.expected).filter(([, outcome]) => outcome !== null),
+            ),
+          };
+        })
+      : value.scenarios,
   };
 }
 
@@ -745,7 +759,7 @@ function goldenFallback(): ModelOutput {
 }
 
 function systemPrompt() {
-  return "You compile underspecified software requirements into behaviorally different contracts. Return only the requested JSON. Never reveal chain-of-thought or write implementation code. Use only the supplied context; do not invent repository facts. Support only boundary_time, authorization_actor, lifecycle_state. Return compiled with exactly two or three interpretations only when each is evidence-grounded and every pair has a differing scenario outcome. For every scenario, include expected.A, expected.B, and expected.C; use null for an ID that is not one of the returned interpretations. Otherwise return needs_context with one to three targeted questions and no interpretations or scenarios.";
+  return "You compile underspecified software requirements into behaviorally different contracts. Return only the requested JSON. Never reveal chain-of-thought or write implementation code. Use only the supplied context; do not invent repository facts. Support only boundary_time, authorization_actor, lifecycle_state. Return compiled with exactly two or three interpretations only when each is evidence-grounded and every pair has a differing scenario outcome. Number each interpretation's acceptance IDs AC1, AC2, and so on. For every scenario, include expected.A, expected.B, and expected.C; use null for an ID that is not one of the returned interpretations. Otherwise return needs_context with one to three targeted questions and no interpretations or scenarios.";
 }
 
 const modelJsonSchema = {
@@ -775,7 +789,10 @@ const modelJsonSchema = {
               type: "object",
               additionalProperties: false,
               required: ["id", "text"],
-              properties: { id: { type: "string" }, text: { type: "string" } },
+              properties: {
+                id: { type: "string", pattern: "^AC[1-9][0-9]*$" },
+                text: { type: "string" },
+              },
             },
           },
           risk: { type: "string" },

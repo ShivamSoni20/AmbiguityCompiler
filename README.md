@@ -106,7 +106,7 @@ sequenceDiagram
 ## Repository layout
 
 ```text
-clarity-engine-main/
+AmbiguityCompiler/
 ├── src/                              # TanStack Start application
 │   ├── components/
 │   │   ├── ac/                       # Ambiguity Compiler UI components
@@ -151,7 +151,7 @@ For contributor conventions and generated-file policy, see [`docs/PROJECT_STRUCT
 
 ```powershell
 git clone <your-repository-url>
-Set-Location clarity-engine-main
+Set-Location AmbiguityCompiler
 bun install --frozen-lockfile
 Copy-Item .env.example .env
 ```

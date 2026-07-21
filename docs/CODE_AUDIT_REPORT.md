@@ -33,9 +33,9 @@ Severity distribution: **P0 4**, **P1 29**, **P2 13**, **P3 0**.
 | Item | Result |
 | --- | --- |
 | Repository root requested by PRD | `D:\Gihtub Main\Ambiguity compiler\AMBIGUITY_COMPILER_PRD.md` |
-| Application audited | `D:\Gihtub Main\Ambiguity compiler\clarity-engine-main` |
+| Application audited | `D:\Gihtub Main\Ambiguity compiler` |
 | Git status / commit | Unavailable: `git -C D:\Gihtub Main\Ambiguity compiler status --short` and `rev-parse HEAD` reported “not a git repository.” |
-| Applicable instructions | `AGENTS.md` under `clarity-engine-main`; it prohibits rewriting published Git history. No history operation was attempted. |
+| Applicable instructions | `AGENTS.md` from the former nested workspace; it prohibits rewriting published Git history. No history operation was attempted. |
 | Package manager | Bun; `bun.lock` and `bunfig.toml` are present. |
 | Runtime versions | Node `v22.14.0`, Bun `1.3.4`, npm `10.9.2`. |
 | Live provider audit | Unverified. The audit did not read `.env`, expose credentials, or make a model call. |
