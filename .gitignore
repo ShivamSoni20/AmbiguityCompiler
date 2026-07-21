@@ -1,0 +1,34 @@
+# Dependencies
+**/node_modules/
+
+# Build and framework output
+**/.output/
+**/.tanstack/
+**/.nitro/
+**/dist/
+**/dist-ssr/
+**/.wrangler/
+
+# Runtime state and reports
+**/.data/
+**/artifacts/test-reports/
+**/coverage/
+*.log
+
+# Secrets and local environment settings
+**/.env
+**/.env.*
+!**/.env.example
+*.local
+
+# Local editor and automation metadata
+.agents/
+.playwright-mcp/
+**/.lovable/
+**/AGENTS.md
+.vscode/
+.idea/
+
+# Operating-system files
+.DS_Store
+Thumbs.db
