@@ -195,6 +195,12 @@ bun run start
 
 The default data file is `mcp-server/.data/compilations.json`. Override it with `AMBIGUITY_COMPILER_DATA_FILE` when you need an isolated local session. On Vercel, the application uses `/tmp/ambiguity-compiler/compilations.json` because the deployed `/var/task` bundle is read-only. That Vercel file is ephemeral and should only be used for a demo; configure an external database or durable store for production.
 
+### Render deployment status
+
+The dashboard can be deployed as one Vercel project. The standalone MCP service is currently designed for local `stdio` and loopback-only Streamable HTTP use. Do not deploy it as a public Render Web Service until its HTTP listener is changed to bind `0.0.0.0` and consume Render's `PORT` environment variable; Render cannot route public traffic to a `127.0.0.1` listener.
+
+When that hosting change is implemented, configure the service with `MCP_TRANSPORT=http`, `BUN_VERSION=1.3.14`, the selected model provider variables, and an external durable data store. Do not expose `OPENROUTER_API_KEY` or `OPENAI_API_KEY` through client-side `VITE_*` variables. The Render free tier and `/tmp` storage are suitable only for transient demos.
+
 ### Tool surface
 
 | Tool                            | Purpose                                                             |
